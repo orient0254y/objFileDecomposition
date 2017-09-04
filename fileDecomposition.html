@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>obj文件分解</title>
+    <!-- saved from url=(0014)about:internet -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    input {
+        outline: none;
+        border: 0;
+    }
+    @font-face {
+        font-family: 'iconfont';
+        src: url('glyphicons-halflings-regular.eot');
+        /* IE9*/
+        src: url('glyphicons-halflings-regular?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('glyphicons-halflings-regular.woff') format('woff'), /* chrome、firefox */
+        url('glyphicons-halflings-regular.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+        url('glyphicons-halflings-regular.svg#iconfont') format('svg');
+        /* iOS 4.1- */
+    }
+    .file-label {
+        position: relative;
+    }
+    #files {
+        position: absolute;
+        opacity: 0;
+        filter: alpha(opacity=0);
+        left: 16.66666667%;
+        right: 0;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center" style="font-size: 24px;font-weight: bold;margin-top: 20px;">obj文件分解</div>
+        <div class="row" style="border:1px solid #ccc;margin-top: 20px;padding:15px 0;border-radius: 4px;font-size: 16px;font-weight: bold;">
+            <div class="col-sm-12 file-label input-group">
+                <span class="col-sm-2 text-right" style="line-height: 34px;">请选择要分解的文件:</span>
+                <label class="col-sm-10">
+                    <input type="file" id="files" onchange="FileDecompositioner.importFile(this)" multiple class="btn btn-default" />
+                    <div class="input-group">
+                        <span class="glyphicon glyphicon-open-file input-group-addon" style="top:0;"></span>
+                        <span id="file-name" class="form-control">文件名(import an obj file)</span>
+                    </div>
+                </label>
+            </div>
+            <div>
+                <span class="col-sm-2" style="margin-right: 15px;"></span>
+                <button class="btn btn-default" onclick="FileDecompositioner.exportFile();">导出(export files)</button>
+                <button class="btn btn-default" onclick="showMsg();">展示信息(show message in console.)</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/FileSaver.js"></script>
+    <script type="text/javascript" src="FileDecomposition.js"></script>
+    <script type="text/javascript">
+        function showMsg(){
+            var data = FileDecompositioner.getFiles();
+            console.log(data);
+        }
+    </script>
+</body>
+
+</html>
