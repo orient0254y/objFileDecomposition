@@ -23,7 +23,7 @@ FileDecomposition.prototype.importFile = function(files) {
             var name = this.selectedFiles[i].name; //读取选中文件的文件名
             // var size = this.selectedFiles[i].size;//读取选中文件的大小
             document.getElementById("file-name").innerHTML = name;
-            this.name = name;
+            this.name = name.substring(0,name.lastIndexOf("."));
             var reader = new FileReader(); //这里是核心！！！读取操作就是由它完成的。
             reader.readAsText(this.selectedFiles[i]); //读取文件的内容
             reader.onload = function() {
@@ -38,8 +38,7 @@ FileDecomposition.prototype.encodeFile = function(data) {
     var fisrtLine = lines[0];
     var str = "";
     //如何将一整个object文件分为不同的object的单独文件呢？
-    var objTextArr = [];
-    var objTextArr2 = [];
+    var objArr = [];
     var objText = "";
     var startLine = "";
     var addStartLineFlag = false;
@@ -47,6 +46,7 @@ FileDecomposition.prototype.encodeFile = function(data) {
     var doneRegex = /^\#/;
     //格式：#开头，空白字符结尾
     var specialRegex = /^\#\s+$/;
+    var sub_object_name = "";
     for (var i = 0, l = lines.length; i < l; i++) {
         if (lines[i].search("mtllib") !== -1) {
             startAdd = true;
@@ -56,12 +56,19 @@ FileDecomposition.prototype.encodeFile = function(data) {
             if (doneRegex.test(lines[i])) {
                 if (lines[i].search("faces") !== -1 || lines[i].search("polygons") !== -1) {
                     objText += lines[i] + "\n";
-                    objTextArr.push(objText);
+                    var obj = {};
+                    obj.text = objText;
+                    obj.name = sub_object_name;
+                    objArr.push(obj);
                     objText = "";
+                    sub_object_name = "";
                     addStartLineFlag = true;
                     continue;
                 };
             } else {
+                if (lines[i].search("usemtl") !== -1) {
+                    sub_object_name = (lines[i].substring(lines[i].indexOf("usemtl") + 6,lines[i].length)).replace(/\s/g,"");
+                }
                 if (addStartLineFlag) {
                     objText += fisrtLine + "\n";
                     objText += "# Beijing blueSummer technology Co., LTD！" + "\r\n";
@@ -74,8 +81,12 @@ FileDecomposition.prototype.encodeFile = function(data) {
             };
         };
     };
-    for (var i = 0, l = objTextArr.length; i < l; i++) {
-        var file = this.toModifyAStandardFormat(objTextArr[i]);
+    for (var i = 0, l = objArr.length; i < l; i++) {
+        var text = this.toModifyAStandardFormat(objArr[i].text);
+        var name = objArr[i].name;
+        var file = {};
+        file.text = text;
+        file.name = name;
         this.filesArray.push(file);
     };
 };
@@ -226,14 +237,13 @@ FileDecomposition.prototype.exportFile = function() {
     if (!filesArray) {
         return;
     };
-    var nameArray = this.nameArray;
     var _this = this;
     var i = 0;
     var timer = setInterval(function(){
-        var blob = new Blob([filesArray[i]], {
+        var blob = new Blob([filesArray[i].text], {
             type: "text/plain;charset=utf-8"
         });
-        saveAs(blob, _this.name); //saveAs(blob,filename)
+        saveAs(blob, _this.name + "." + filesArray[i].name + "." + "obj"); //saveAs(blob,filename)
         document.getElementById("file-name").innerHTML = "文件名";
         i ++;
         if (i === filesArray.length) {
